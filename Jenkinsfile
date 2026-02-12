@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Run Health Check') {
             steps {
-                sh './health_check.sh'
+                // Use bat for Windows
+                bat 'bash ./health_check.sh'
             }
         }
 
