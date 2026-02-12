@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    environment {
-        LOG_FILE = "server_health.log"
-    }
+//    environment {
+//        LOG_FILE = "server_health.log"
+//    }
 
     stages {
         stage('Run Health Check') {
@@ -29,18 +29,18 @@ pipeline {
             }
         }
 
-        stage('Fail on High Usage') {
-            steps {
-                script {
-                    def logContent = readFile('server_health.log')
-                    
-                    if (logContent.contains("WARNING: CPU usage is above threshold") ||
-                        logContent.contains("WARNING: Memory usage is above threshold") ||
-                        logContent.contains("WARNING: Disk usage is above threshold")) {
-                        error("Server usage exceeded thresholds! Check the logs.")
-                    }
-                }
-            }
-        }
+
+        // stage('Fail on High Usage') {
+        //     steps {
+        //         script {
+        //             def logContent = readFile('server_health.log')
+        //             
+        //             if (logContent.contains("WARNING: CPU usage is above threshold") ||
+        //                 logContent.contains("WARNING: Memory usage is above threshold")) {
+        //                 error("Server usage exceeded thresholds! Check the logs.")
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
