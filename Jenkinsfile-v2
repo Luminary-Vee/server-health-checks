@@ -1,46 +1,26 @@
 pipeline {
     agent any
 
-//    environment {
-//        LOG_FILE = "server_health.log"
-//    }
-
     stages {
         stage('Run Health Check') {
             steps {
-                // Run the Bash/PowerShell script and save output to a log
-                bat """
-                    echo Starting server health check... > %LOG_FILE%
-                    call health_check.sh >> %LOG_FILE% 2>&1
-                """
+                bat '''
+                    echo Starting server health check... > server_health.log
+                    call health_check.sh >> server_health.log 2>&1
+                '''
             }
         }
 
         stage('Display Log') {
             steps {
-                // Print log to console for visibility
-                bat "type %LOG_FILE%"
+                bat 'type server_health.log'
             }
         }
 
         stage('Archive Logs') {
             steps {
-                archiveArtifacts artifacts: "%LOG_FILE%", fingerprint: true
+                archiveArtifacts artifacts: 'server_health.log', fingerprint: true
             }
         }
-
-
-        // stage('Fail on High Usage') {
-        //     steps {
-        //         script {
-        //             def logContent = readFile('server_health.log')
-        //             
-        //             if (logContent.contains("WARNING: CPU usage is above threshold") ||
-        //                 logContent.contains("WARNING: Memory usage is above threshold")) {
-        //                 error("Server usage exceeded thresholds! Check the logs.")
-        //             }
-        //         }
-        //     }
-        // }
     }
 }
