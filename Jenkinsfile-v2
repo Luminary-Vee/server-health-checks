@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    environment {
+        LOG_FILE = "server_health.log"
+    }
+
+    stages {
+        stage('Run Health Check') {
+            steps {
+                // Run the Bash script and save output to a log
+                sh """
+                    echo "Starting server health check..." > $LOG_FILE
+                    ./health_check.sh >> $LOG_FILE 2>&1
+                """
+            }
+        }
+
+        stage('Display Log') {
+            steps {
+                // Print log to console for visibility
+                sh "cat $LOG_FILE"
+            }
+        }
+
+        stage('Archive Logs') {
+            steps {
+                archiveArtifacts artifacts: "$LOG_FILE", fingerprint: true
+            }
+        }
+
+        stage('Fail on High Usage') {
+            steps {
+                script {
+                    def logContent = readFile(LOG_FILE)
+                    
+                    if (logContent.contains("WARNING: CPU usage is above threshold") ||
+                        logContent.contains("WARNING: Memory usage is above threshold")) {
+                        error("Server usage exceeded thresholds! Check the logs.")
+                    }
+                }
+            }
+        }
+    }
+}
